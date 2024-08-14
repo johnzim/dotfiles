@@ -1,4 +1,3 @@
-syntax on
 "set shiftwidth=4 // Normal
 set shiftwidth=2 "EatClub!
 set expandtab
@@ -15,7 +14,6 @@ set shell=/bin/bash
 " Drop all Trailing Whitespace
 autocmd BufWritePre * :%s/\s\+$//e
 
-
 " Auto reload in buffer when nvim gains focus again
 au FocusGained,BufEnter * :silent! !
 
@@ -28,53 +26,71 @@ au FocusLost,WinLeave * :silent! noautocmd w
 set path+=**
 set wildmenu
 
+" lowering the update time for some faster gutters
+set updatetime=100
+
+set title
+set titlestring=%{expand('%')}
+
+" don't move my cheese
+unmap Y
+
 " VUNDLE STUFF
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
 call plug#begin('~/.config/nvim/plugged')
 
+let @l=':lua jl_comment()'
+let @p=':w ! black %'
+"
+" SnakeCase Convert To camelCase
+let @k=':%s/_\(\w\)/\u\1/g'
+
+Plug 'neovim/nvim-lspconfig'
+Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-buffer'
+Plug 'hrsh7th/vim-vsnip'
+Plug 'hrsh7th/vim-vsnip-integ'
+Plug 'hrsh7th/nvim-cmp'
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-cmdline'
+
 " VimAirline stuff
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-"
-Plug 'python-mode/python-mode'
-
-" Syntastic stuff
-"#Plug 'scrooloose/syntastic'
-"#Plug 'mtscout6/syntastic-local-eslint.vim'
-
-Plug 'w0rp/ale'
 
 Plug 'godlygeek/Tabular'
-Plug 'kien/ctrlp.vim'
+"Plug 'kien/ctrlp.vim'
 
-Plug 'airblade/vim-gitgutter'
+Plug 'iCyMind/NeoSolarized'
 
-Plug 'frankier/neovim-colors-solarized-truecolor-only'
-Plug 'pangloss/vim-javascript'
-Plug 'mxw/vim-jsx'
-Plug 'Shougo/neocomplcache'
-Plug 'craigemery/vim-autotag'
-"Plug 'nixprime/cpsm'
-
-Plug 'mileszs/ack.vim'
-
-Plug 'shougo/deoplete.nvim'
 
 " plugin on GitHub repo
 Plug 'tpope/vim-fugitive'
 Plug 'vim-scripts/L9'
+
 " Git plugin not hosted on GitHub
 Plug 'git://git.wincent.com/command-t.git'
 Plug 'scrooloose/nerdcommenter'
+Plug 'airblade/vim-gitgutter'
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
+Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+
+Plug 'f-person/git-blame.nvim'
+
 call plug#end()
 
+syntax on
 
-"Use deoplete.
-let g:deoplete#enable_at_startup = 1
-
-nnoremap <Leader>a :Ack<space>
 let g:ackprg = 'rg --vimgrep --no-heading'
 
 " Airline Config
@@ -83,96 +99,27 @@ let g:ackprg = 'rg --vimgrep --no-heading'
   endif
 
 let g:airline_theme= 'solarized'
-"let g:airline#extensions#tabline#enabled = 2
 let g:airline#extensions#tabline#enabled = 0
 
-let g:airline#extensions#ale#enabled = 1
+let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
+let airline#extensions#languageclient#error_symbol = '!'
+let airline#extensions#nvimlsp#error_symbol = '!'
 
-"let g:ctrlp_match_func = {'match': 'cpsm#CtrlPMatch'}
-
-"let g:airline_section_z = ['line number']
-
-" I like Mac style saves
-:map <M-s> :w<kEnter>  "Works in normal mode, must press Esc first"
-:imap <M-s> <Esc>:w<kEnter>i "Works in insert mode, saves and puts back in insert mode"
-
-nnoremap ( :Ack <cword><cr>
-
-
-
-
-" CTRLP Stuff
-set wildignore+=**/installer
-set wildignore+=**/node_modules
-nmap <silent> <Leader>fr :CtrlPMixed<CR>
-nnoremap <silent> <leader>C :ClearCtrlPCache<cr>\|:CtrlP<cr>
-
-" use RipGrep for searching
-let g:ctrlp_user_command = 'rg %s --files --color=never --glob ""'
-let g:ctrlp_use_caching = 0
+let g:prettier#autoformat_config_files = ['.prettierrc.json']
+let g:gitblame_enabled = 0
+let g:CommandTPreferredImplementation='lua'
 
 " Commenting
-":map <D-/> <leader>c<space>
+:map <D-/> <leader>c<space>
 
 " Enter normal mode in terminal with Esc
 :tnoremap <Esc> <C-\><C-n>
 
-
-"set statusline+=%#warningmsg#
-"set statusline+=%*
-"
-"set statusline+=%{SyntasticStatuslineFlag()}
-"let g:syntastic_always_populate_loc_list = 1
-"let g:syntastic_loc_list_height = 5
-"let g:syntastic_auto_loc_list = 0
-"let g:syntastic_check_on_open = 1
-"let g:syntastic_check_on_wq = 1
-"let g:syntastic_javascript_checkers = ['eslint']
-"
-"
-"let g:syntastic_error_symbol = '❌'
-"let g:syntastic_style_error_symbol = '⁉️'
-"let g:syntastic_warning_symbol = '⚠️'
-"let g:syntastic_style_warning_symbol = '💩'
-"
-"highlight link SyntasticErrorSign SignColumn
-"highlight link SyntasticWarningSign SignColumn
-"highlight link SyntasticStyleErrorSign SignColumn
-"highlight link SyntasticStyleWarningSign SignColumn
-"
-
-"let g:python_host_prog="/Users/johnlouisswaine/.virtualenvs/neovim/bin/python"
-let python_highlight_all = 1
-
-"let g:pymode = 1
-
-
-"let g:pymode_folding = 1
-"let g:pymode_quickfix_minheight = 3
-"let g:pymode_quickfix_maxheight = 6
-"let g:pymode_virtualenv = 1
-"let g:pymode_breakpoint = 1
-"let g:pymode_breakpoint_bind = '<leader>b'
-
-"let g:pymode_rope = 1
-"let g:pymode_rope_completion = 1
-"let g:pymode_rope_lookup_project = 0
-"let g:pymode_rope_complete_on_dot = 1
-"let g:pymode_rope_completion_bind = '<C-Space>'
-"let g:pymode_rope_autoimport_modules = ['os', 'shutil', 'datetime']
-"let g:pymode_rope_goto_definition_bind = '<leader>g'
-"let g:pymode_rope_goto_definition_cmd = 'new'
-
-let g:ale_enabled = 1
-let g:ale_sign_error = '❌'
-let g:ale_sign_warning = '⚠️'
-
-
-let g:ale_fixers = {
-\   'javascript': ['eslint'],
-\}
+" bd but keep the split
+nnoremap <leader>d :b#<bar>bd#<CR>
 
 filetype plugin indent on    " required
+
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
 "
@@ -182,10 +129,8 @@ filetype plugin indent on    " required
 " :PlugSearch foo - searches for foo; append `!` to refresh local cache
 " :PlugClean      - confirms removal of unused plugins; append `!` to auto-approve removal
 "
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plug stuff after this line
-set termguicolors
-colorscheme solarized
+colorscheme NeoSolarized
+
 
 "highlight FoldColumn  gui=bold    guifg=grey65     guibg=Grey90
 highlight Folded      gui=italic
@@ -196,4 +141,298 @@ highlight Folded      gui=italic
 silent! helptags ALL
 set undodir=$HOME/.config/nvim/tmp
 set dir=$HOME/.config/nvim/tmp/swap
+set termguicolors
 if !isdirectory(&dir) | call mkdir(&dir, 'p', 0700) | endif
+
+" set up language servers
+lua << EOF
+local lspconfig = require'lspconfig'
+
+vim.o.completeopt = "menu,menuone,noselect"
+
+-- Jedi
+-- require'lspconfig'.jedi_language_server.setup{}
+
+require'lspconfig'.pyright.setup{}
+
+
+-- Compe setup
+local cmp = require'cmp'
+
+cmp.setup {
+  snippet = {
+    expand = function(args)
+      vim.fn["vsnip#anonymous"](args.body)
+    end,
+  },
+  mapping = {
+    ['<CR>'] = cmp.mapping.confirm({
+      behavior = cmp.ConfirmBehavior.Replace,
+      select = true,
+    }),
+    ['<Tab>'] = cmp.mapping.confirm({
+      behavior = cmp.ConfirmBehavior.Replace,
+      select = true,
+    }),
+   ['<C-n>'] = cmp.mapping({
+          c = function()
+              if cmp.visible() then
+                  cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+              else
+                  vim.api.nvim_feedkeys(t('<Down>'), 'n', true)
+              end
+          end,
+          i = function(fallback)
+              if cmp.visible() then
+                  cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+              else
+                  fallback()
+              end
+          end
+      }),
+   ['<C-p>'] = cmp.mapping({
+          c = function()
+              if cmp.visible() then
+                  cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+              else
+                  vim.api.nvim_feedkeys(t('<Up>'), 'n', true)
+              end
+          end,
+          i = function(fallback)
+              if cmp.visible() then
+                  cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+              else
+                  fallback()
+              end
+          end
+      }),
+  },
+  formatting = {
+    format = function(entry, vim_item)
+      --  vim_item.kind = lspkind.presets.default[vim_item.kind] .. " " .. vim_item.kindvim_item.kind = lspkind.presets.default[vim_item.kind] .. " " .. vim_item.kind
+      return vim_item
+    end
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'treesitter' }
+  }
+}
+
+local t = function(str)
+  return vim.api.nvim_replace_termcodes(str, true, true, true)
+end
+
+local check_back_space = function()
+    local col = vim.fn.col('.') - 1
+    if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
+        return true
+    else
+        return false
+    end
+end
+
+-- ts lsp
+require'lspconfig'.tsserver.setup{}
+
+-- require("lsp_lines").setup()
+
+vim.diagnostic.config({
+  virtual_text = true,
+})
+
+require'nvim-treesitter.configs'.setup {
+  indent = {
+    enable = true
+  },
+  highlight = {
+    enable = true,
+    custom_captures = {
+      -- Highlight the @foo.bar capture group with the "Identifier" highlight group.
+      ["console.log"] = "Identifier",
+    },
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+  context_commentstring = {
+    enable = true,
+    config = {
+       javascript = {
+        __default = '// %s',
+        jsx_element = '{/* %s */}',
+        jsx_fragment = '{/* %s */}',
+        jsx_attribute = '// %s',
+        comment = '// %s'
+      },
+       typescript = {
+        __default = '// %s',
+        jsx_element = '{/* %s */}',
+        jsx_fragment = '{/* %s */}',
+        jsx_attribute = '// %s',
+        comment = '// %s'
+      }
+    }
+  }
+}
+
+telescope = require('telescope').setup{
+  defaults = {
+    vimgrep_arguments = {
+      'rg',
+      '--color=never',
+      '--no-heading',
+      '--with-filename',
+      '--line-number',
+      '--column',
+      '--smart-case'
+    },
+    prompt_prefix = "> ",
+    selection_caret = "> ",
+    entry_prefix = "  ",
+    initial_mode = "insert",
+    selection_strategy = "reset",
+    sorting_strategy = "descending",
+    layout_strategy = "horizontal",
+    layout_config = {
+      horizontal = {
+        mirror = false,
+      },
+      vertical = {
+        mirror = false,
+      },
+    },
+    file_sorter =  require'telescope.sorters'.get_fuzzy_file,
+    file_ignore_patterns = {"stormfront/public/*"},
+    generic_sorter =  require'telescope.sorters'.get_generic_fuzzy_sorter,
+    winblend = 0,
+    border = {},
+    borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+    color_devicons = true,
+    use_less = true,
+    path_display = {},
+    set_env = { ['COLORTERM'] = 'truecolor' }, -- default = nil,
+    file_previewer = require'telescope.previewers'.vim_buffer_cat.new,
+    grep_previewer = require'telescope.previewers'.vim_buffer_vimgrep.new,
+    qflist_previewer = require'telescope.previewers'.vim_buffer_qflist.new,
+
+    -- Developer configurations: Not meant for general override
+    buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker
+  }
+}
+
+find_files_no_test = function()
+  require('telescope.builtin').find_files({
+    vimgrep_arguments = {
+      'rg',
+      '--color=never',
+      '--no-heading',
+      '--with-filename',
+      '--line-number',
+      '--column',
+      '--smart-case',
+      '--glob', '!**tests**',
+    },
+  })
+end
+
+find_text_no_test = function()
+  require('telescope.builtin').live_grep({
+    vimgrep_arguments = {
+      'rg',
+      '--color=never',
+      '--no-heading',
+      '--with-filename',
+      '--line-number',
+      '--column',
+      '--smart-case',
+      '--glob', '!**/tests/**',
+    },
+  })
+end
+
+jl_comment = function()
+  -- Get current filetype
+  local filetype = vim.bo.filetype
+
+  -- Get the full word or expression under the cursor
+  local word = vim.fn.expand('<cword>')
+  local line = vim.fn.getline('.')
+  local cursor_pos = vim.fn.col('.')
+  -- Patterns to match the full word or expression
+  local left_part = line:sub(1, cursor_pos):match("[_%w%.]+$")
+  local right_part = line:sub(cursor_pos + 1):match("^[_%w%.]*")
+
+  -- Combine both parts to get the full word/expression
+  local full_word = left_part .. right_part
+
+  -- Get the current line's indentation
+  local indent = vim.fn.indent('.')
+  local indent_str = string.rep(" ", indent)
+
+  -- Prepare the debug statement based on filetype
+  local debug_statement = ""
+  if filetype == "python" then
+    debug_statement = indent_str .. "print(f'".. full_word .. " is {".. full_word.. "}')"
+  elseif filetype == "typescript" or filetype == "javascript" or filetype == "typescriptreact" then
+    debug_statement = indent_str .. "console.log('".. full_word .. " is', ".. full_word.. ");"
+  end
+
+  -- Insert the debug statement below the current line
+  vim.api.nvim_put({debug_statement}, 'l', true, true)
+end
+
+local selected_text = (function()
+    vim.cmd('noau normal! "vy"')
+    local text = vim.fn.getreg('v')
+    vim.fn.setreg('v', {})
+    text = string.gsub(text, "\n", "")
+    if string.len(text) == 0 then
+        text = nil
+    end
+    return text
+  end
+)()
+
+vim.opt.termguicolors = true
+
+vim.api.nvim_set_keymap('n', '<leader>ffnt', ":lua find_files_no_test()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>ftnt', ":lua find_text_no_test()<CR>", { noremap = true, silent = true })
+
+EOF
+
+nnoremap ( <cmd>lua require('telescope.builtin').grep_string({search = vim.fn.expand("<cword>")})<cr>
+nnoremap <C-p> <cmd>lua require('telescope.builtin').find_files()<cr>
+nnoremap <leader><C-p>
+nnoremap <leader>a <cmd>lua require('telescope.builtin').live_grep()<cr>
+nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
+nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+nnoremap <leader>? <cmd>lua vim.diagnostic.open_float()<cr>
+nnoremap <leader>rn <cmd>lua vim.lsp.buf.rename()<cr>
+nnoremap <leader>bl <cmd>GitBlameToggle<cr>
+
+" imap <silent><script><expr> <C-j> copilot#Accept("\<CR>")
+" let g:copilot_no_tab_map = v:true
+
+
+
+"vim.cmd [[highlight IndentBlanklineIndent1 guibg=#002b36 blend=nocombine]]
+"vim.cmd [[highlight IndentBlanklineIndent2 guibg=#073642 blend=nocombine]]
+"require("indent_blankline").setup {
+  "char = " ",
+  "space_char_blankline = "",
+  "char_highlight_list = {
+    ""IndentBlanklineIndent1",
+    ""IndentBlanklineIndent2",
+  "},
+  "space_char_highlight_list = {
+    ""IndentBlanklineIndent1",
+    ""IndentBlanklineIndent2",
+  "},
+  "show_trailing_blankline_indent = false,
+  "buftype_exclude = {"terminal"},
+  "show_current_context = true,
+"}
+
